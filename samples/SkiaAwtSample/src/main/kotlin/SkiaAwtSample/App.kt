@@ -3,8 +3,13 @@ package SkiaAwtSample
 import kotlinx.coroutines.*
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
+import java.awt.AlphaComposite
+import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
 import java.awt.Dimension
+import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.Toolkit
 import java.awt.event.*
 import java.awt.RenderingHints
@@ -33,13 +38,14 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR -> PixelGeometry.BGR_V
         else -> PixelGeometry.UNKNOWN
     }
-    val skiaLayer = SkiaLayer(pixelGeometry = pixelGeometry)
+    val skiaLayer = SkiaLayer(pixelGeometry = pixelGeometry, renderApi = GraphicsApi.SOFTWARE_FAST)
+    skiaLayer.transparency = true
     val clocks = ClocksAwt(skiaLayer)
 
     val window = JFrame(title)
+    window.isUndecorated = false
     window.defaultCloseOperation =
         if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
-    window.background = Color.GREEN
     window.contentPane.add(skiaLayer)
 
     // Create menu.
@@ -109,7 +115,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
 
     editMenu.add(miEmojiAndSymbols)
 
-    window.setJMenuBar(menuBar)
+//    window.setJMenuBar(menuBar)
 
     skiaLayer.onStateChanged(SkiaLayer.PropertyKind.Renderer) { layer ->
         println("Changed renderer for $layer: new value is ${layer.renderApi}")
@@ -155,7 +161,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     // MANDATORY: set window preferred size before calling pack()
     window.preferredSize = Dimension(800, 600)
     window.pack()
-    skiaLayer.disableTitleBar(64f)
+    skiaLayer.disableTitleBar(20f)
     window.pack()
     skiaLayer.paint(window.graphics)
     window.isVisible = true

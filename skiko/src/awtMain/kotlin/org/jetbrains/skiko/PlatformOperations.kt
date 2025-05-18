@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import java.awt.Canvas
 import java.awt.Component
 import java.awt.Window
 import java.awt.event.ComponentAdapter
@@ -97,6 +98,10 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
+                    if (component is Canvas) {
+                        println("call extern window proc")
+                        windowsDisableTitleBar(component, component.useDrawingSurfacePlatformInfo { platformInfo -> platformInfo }, headerHeight)
+                    }
                 }
 
                 override fun orderEmojiAndSymbolsPopup() {
@@ -136,3 +141,6 @@ external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
 external private fun osxDisableTitleBar(component: Component, headerHeight: Float)
 external private fun osxOrderEmojiAndSymbolsPopup()
+
+// Windows
+external private fun windowsDisableTitleBar(component: Component, platformInfo: Long, headerHeight: Float)
